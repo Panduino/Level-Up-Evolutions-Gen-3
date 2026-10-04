@@ -127,6 +127,17 @@ return function(mod)
     end
   end
 
+  -- Gen IV trade/item evolutions must be registered explicitly. The National
+  -- Dex metadata knows these chains, but the Gen 3 runtime does not always
+  -- expose their trade rows to evolution.check.
+  local GEN4_TRADE_LEVEL_EVOLUTIONS = {
+    { source = 112, target = 464, level = 55 }, -- Rhydon -> Rhyperior
+    { source = 125, target = 466, level = 52 }, -- Electabuzz -> Electivire
+    { source = 126, target = 467, level = 52 }, -- Magmar -> Magmortar
+    { source = 233, target = 474, level = 45 }, -- Porygon2 -> Porygon-Z
+    { source = 356, target = 477, level = 43 }, -- Dusclops -> Dusknoir
+  }
+
   local EXTRA_LEVEL_EVOLUTIONS = {
     { source = 82, target = 462, level = 45 }, -- Magneton -> Magnezone
     { source = 193, target = 469, level = 40 }, -- Yanma -> Yanmega
@@ -148,7 +159,10 @@ return function(mod)
   local function addExtraLevelEvolutions()
     local Pokemon = require("src.core.game3.pokemon")
     Pokemon._evolutions = Pokemon._evolutions or {}
-    for _, spec in ipairs(EXTRA_LEVEL_EVOLUTIONS) do
+    local all = {}
+    for _, spec in ipairs(GEN4_TRADE_LEVEL_EVOLUTIONS) do all[#all + 1] = spec end
+    for _, spec in ipairs(EXTRA_LEVEL_EVOLUTIONS) do all[#all + 1] = spec end
+    for _, spec in ipairs(all) do
       local source = Pokemon.speciesFromNational(spec.source)
       local target = Pokemon.speciesFromNational(spec.target)
       if source and target then
