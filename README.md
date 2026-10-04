@@ -17,3 +17,4 @@
 | Magmar | Magmortar | Level 52 |
 | Porygon2 | Porygon-Z | Level 45 |
 | Dusclops | Dusknoir | Level 43 |
+| Eevee | Leafeon | Leaf Stone |
