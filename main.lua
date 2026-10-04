@@ -98,7 +98,7 @@ return function(mod)
     local leafeon = Pokemon.speciesFromNational(470)
     local leafStone = ItemsData.toNumericId("leaf-stone")
     if not eevee or not leafeon or not leafStone then return end
-    Pokemon._evolutions = Pokemon._evolutions or {}
+    Pokemon.evolutions(eevee) -- force the host evolution dataset to load first
     local rows = Pokemon._evolutions[eevee] or {}
     Pokemon._evolutions[eevee] = rows
     for _, row in ipairs(rows) do
@@ -111,7 +111,7 @@ return function(mod)
     local Pokemon = require("src.core.game3.pokemon")
     local eevee = Pokemon.speciesFromNational(133)
     if not eevee then return end
-    Pokemon._evolutions = Pokemon._evolutions or {}
+    Pokemon.evolutions(eevee) -- force the host evolution dataset to load first
     local rows = Pokemon._evolutions[eevee] or {}
     Pokemon._evolutions[eevee] = rows
     local wanted = { 196, 197, 471 }
@@ -158,7 +158,9 @@ return function(mod)
 
   local function addExtraLevelEvolutions()
     local Pokemon = require("src.core.game3.pokemon")
-    Pokemon._evolutions = Pokemon._evolutions or {}
+    -- Do not create _evolutions ourselves: Pokemon.evolutions() only loads the
+    -- host dataset while _evolutions is nil. Force-load it before patching.
+    Pokemon.evolutions(Pokemon.speciesFromNational(1) or 1)
     local all = {}
     for _, spec in ipairs(GEN4_TRADE_LEVEL_EVOLUTIONS) do all[#all + 1] = spec end
     for _, spec in ipairs(EXTRA_LEVEL_EVOLUTIONS) do all[#all + 1] = spec end
