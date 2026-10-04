@@ -107,14 +107,6 @@ return function(mod)
     rows[#rows + 1] = { method = 7, param = leafStone, target = leafeon }
   end
 
-  mod.events:on("game.ready", function()
-    addLeafeon()
-    local Pokemon = require("src.core.game3.pokemon")
-    if Pokemon.onReload then
-      Pokemon.onReload(addLeafeon, "level_up_trade_evolutions")
-    end
-  end)
-
   local function addEeveeRows()
     local Pokemon = require("src.core.game3.pokemon")
     local eevee = Pokemon.speciesFromNational(133)
@@ -135,8 +127,18 @@ return function(mod)
     end
   end
 
-  addEeveonRows = addEeveeRows
-  addEeveeRows()
+  local function addEeveeEvolutions()
+    addLeafeon()
+    addEeveeRows()
+  end
+
+  mod.events:on("game.ready", function()
+    addEeveeEvolutions()
+    local Pokemon = require("src.core.game3.pokemon")
+    if Pokemon.onReload then
+      Pokemon.onReload(addEeveeEvolutions, "level_up_trade_evolutions")
+    end
+  end)
 
   mod.hooks:wrap("evolution.check", function(next, game, mon, evo, trigger)
     local normal = next()
