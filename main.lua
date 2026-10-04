@@ -91,6 +91,30 @@ return function(mod)
     return 0
   end
 
+  local function addLeafeon()
+    local Pokemon = require("src.core.game3.pokemon")
+    local ItemsData = require("src.core.game3.items_data")
+    local eevee = Pokemon.speciesFromNational(133)
+    local leafeon = Pokemon.speciesFromNational(470)
+    local leafStone = ItemsData.toNumericId("leaf-stone")
+    if not eevee or not leafeon or not leafStone then return end
+    Pokemon._evolutions = Pokemon._evolutions or {}
+    local rows = Pokemon._evolutions[eevee] or {}
+    Pokemon._evolutions[eevee] = rows
+    for _, row in ipairs(rows) do
+      if tonumber(row.target) == leafeon then return end
+    end
+    rows[#rows + 1] = { method = 7, param = leafStone, target = leafeon }
+  end
+
+  mod.events:on("game.ready", function()
+    addLeafeon()
+    local Pokemon = require("src.core.game3.pokemon")
+    if Pokemon.onReload then
+      Pokemon.onReload(addLeafeon, "level_up_trade_evolutions")
+    end
+  end)
+
   mod.hooks:wrap("evolution.check", function(next, game, mon, evo, trigger)
     local normal = next()
     if normal then return true end
