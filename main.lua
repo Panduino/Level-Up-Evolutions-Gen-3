@@ -115,10 +115,58 @@ return function(mod)
     end
   end)
 
+  local function addEeveeRows()
+    local Pokemon = require("src.core.game3.pokemon")
+    local eevee = Pokemon.speciesFromNational(133)
+    if not eevee then return end
+    Pokemon._evolutions = Pokemon._evolutions or {}
+    local rows = Pokemon._evolutions[eevee] or {}
+    Pokemon._evolutions[eevee] = rows
+    local wanted = { 196, 197, 471 }
+    for _, nat in ipairs(wanted) do
+      local target = Pokemon.speciesFromNational(nat)
+      if target then
+        local found = false
+        for _, row in ipairs(rows) do
+          if tonumber(row.target) == target then found = true break end
+        end
+        if not found then rows[#rows + 1] = { method = 4, param = 1, target = target } end
+      end
+    end
+  end
+
+  addEeveonRows = addEeveeRows
+  addEeveeRows()
+
   mod.hooks:wrap("evolution.check", function(next, game, mon, evo, trigger)
     local normal = next()
+    if not trigger or trigger.kind ~= "levelup" then return normal end
+
+    local Pokemon = require("src.core.game3.pokemon")
+    local source = Pokemon.speciesOf(mon) or tonumber(mon and (mon.species or mon.speciesId))
+    local sourceNat = source and Pokemon.national and tonumber(Pokemon.national(source))
+    local target = tonumber(evo and evo.speciesId)
+    local targetNat = target and Pokemon.national and tonumber(Pokemon.national(target))
+
+    if sourceNat == 133 and (targetNat == 196 or targetNat == 197 or targetNat == 471) then
+      local held = numericItem(mon.item or mon.heldItem)
+      if targetNat == 471 then return held == numericItem("never-melt-ice") end
+      if held ~= numericItem("soothe-bell") then return false end
+      local t = os.date("*t")
+      local minutes = t.hour * 60 + t.min
+      local period
+      if minutes >= 4 * 60 and minutes < 10 * 60 then
+        period = "morning"
+      elseif minutes >= 10 * 60 and minutes < 18 * 60 then
+        period = "day"
+      else
+        period = "night"
+      end
+      if targetNat == 196 then return period ~= "night" end
+      return period == "night"
+    end
+
     if normal then return true end
-    if not trigger or trigger.kind ~= "levelup" then return false end
 
     local method = tradeMethod(evo)
     if not method then return false end
