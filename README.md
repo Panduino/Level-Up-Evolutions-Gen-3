@@ -18,3 +18,6 @@
 | Porygon2 | Porygon-Z | Level 45 |
 | Dusclops | Dusknoir | Level 43 |
 | Eevee | Leafeon | Leaf Stone |
+| Eevee | Espeon | Level up holding Soothe Bell during morning/day |
+| Eevee | Umbreon | Level up holding Soothe Bell at night |
+| Eevee | Glaceon | Level up holding Never-Melt Ice |
