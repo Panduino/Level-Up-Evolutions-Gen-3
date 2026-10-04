@@ -246,6 +246,19 @@ return function(mod)
       return originalLevelTarget(mon, session)
     end
 
+    -- National Dex adds Leaf Stone outside FireRed's native item table, so its
+    -- numeric id is not one of the six ROM evolution stones. Teach the field
+    -- item router to classify it as an evolution stone before party selection.
+    local ItemsData = require("src.core.game3.items_data")
+    if not ItemsData._levelUpEvoLeafStoneInstalled then
+      ItemsData._levelUpEvoLeafStoneInstalled = true
+      local originalFieldUseKind = ItemsData.fieldUseKind
+      ItemsData.fieldUseKind = function(itemId)
+        if numericItem(itemId) == numericItem("leaf-stone") then return "evo" end
+        return originalFieldUseKind(itemId)
+      end
+    end
+
     local originalItemTarget = Evolution.itemTarget
     Evolution.itemTarget = function(mon, itemId, session)
       local source = Pokemon.speciesOf(mon) or tonumber(mon and (mon.species or mon.speciesId))
