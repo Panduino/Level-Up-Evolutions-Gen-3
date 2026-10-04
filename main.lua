@@ -191,7 +191,86 @@ return function(mod)
     addExtraLevelEvolutions()
   end
 
+  local function installDirectEvolutionOverrides()
+    local Pokemon = require("src.core.game3.pokemon")
+    local Evolution = require("src.core.game3.evolution")
+    if Evolution._levelUpTradeEvolutionsInstalled then return end
+    Evolution._levelUpTradeEvolutionsInstalled = true
+
+    local directLevels = {}
+    for _, spec in ipairs(GEN4_TRADE_LEVEL_EVOLUTIONS) do directLevels[spec.source] = spec end
+    for _, spec in ipairs(EXTRA_LEVEL_EVOLUTIONS) do directLevels[spec.source] = spec end
+
+    local originalLevelTarget = Evolution.levelTarget
+    Evolution.levelTarget = function(mon, session)
+      local source = Pokemon.speciesOf(mon) or tonumber(mon and (mon.species or mon.speciesId))
+      local sourceNat = source and Pokemon.national and tonumber(Pokemon.national(source))
+      local level = tonumber(mon and mon.level) or 1
+
+      -- Eevee's three custom level-up branches.
+      if sourceNat == 133 then
+        local held = numericItem(mon.item or mon.heldItem)
+        local targetNat
+        if held == numericItem("never-melt-ice") then
+          targetNat = 471
+        elseif held == numericItem("soothe-bell") then
+          local okRtc, Rtc = pcall(require, "src.core.game3.rtc")
+          local hours
+          if okRtc and Rtc and Rtc.enabled and Rtc.enabled(session) then
+            local t = Rtc.calcLocalTime(session)
+            hours = t and tonumber(t.hours)
+          end
+          if hours ~= nil then targetNat = (hours >= 12 and hours < 24) and 196 or 197 end
+        end
+        if targetNat then
+          local target = Pokemon.speciesFromNational(targetNat)
+          if target and Evolution.nationalAllows(target, session) then return target, 1 end
+        end
+      end
+
+      local spec = sourceNat and directLevels[sourceNat]
+      if spec and level >= spec.level then
+        local allowed = true
+        if sourceNat == 281 then
+          local female = mon.gender == 1 or mon.gender == "female" or mon.isFemale == true
+          allowed = not female
+        elseif sourceNat == 361 then
+          local female = mon.gender == 1 or mon.gender == "female" or mon.isFemale == true
+          allowed = female
+        end
+        if allowed then
+          local target = Pokemon.speciesFromNational(spec.target)
+          if target and Evolution.nationalAllows(target, session) then return target, spec.level end
+        end
+      end
+      return originalLevelTarget(mon, session)
+    end
+
+    local originalItemTarget = Evolution.itemTarget
+    Evolution.itemTarget = function(mon, itemId, session)
+      local source = Pokemon.speciesOf(mon) or tonumber(mon and (mon.species or mon.speciesId))
+      local sourceNat = source and Pokemon.national and tonumber(Pokemon.national(source))
+      if sourceNat == 133 and numericItem(itemId) == numericItem("leaf-stone") then
+        local target = Pokemon.speciesFromNational(470)
+        if target and Evolution.nationalAllows(target, session) then return target end
+      end
+      return originalItemTarget(mon, itemId, session)
+    end
+
+    -- Party-menu eligibility checks use itemCheck separately from itemTarget.
+    local originalItemCheck = Evolution.itemCheck
+    Evolution.itemCheck = function(mon, itemId)
+      local source = Pokemon.speciesOf(mon) or tonumber(mon and (mon.species or mon.speciesId))
+      local sourceNat = source and Pokemon.national and tonumber(Pokemon.national(source))
+      if sourceNat == 133 and numericItem(itemId) == numericItem("leaf-stone") then
+        return Pokemon.speciesFromNational(470)
+      end
+      return originalItemCheck(mon, itemId)
+    end
+  end
+
   mod.events:on("game.ready", function()
+    installDirectEvolutionOverrides()
     addEeveeEvolutions()
     local Pokemon = require("src.core.game3.pokemon")
     if Pokemon.onReload then
