@@ -91,7 +91,7 @@ return function(mod)
     return 0
   end
 
-  mod.hooks:on("evolution.check", function(next, game, mon, evo, trigger)
+  mod.hooks:wrap("evolution.check", function(next, game, mon, evo, trigger)
     local normal = next()
     if normal then return true end
     if not trigger or trigger.kind ~= "levelup" then return false end
