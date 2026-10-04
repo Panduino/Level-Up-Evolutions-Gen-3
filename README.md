@@ -21,3 +21,15 @@
 | Eevee | Espeon | Level up holding Soothe Bell during morning/day |
 | Eevee | Umbreon | Level up holding Soothe Bell at night |
 | Eevee | Glaceon | Level up holding Never-Melt Ice |
+| Roselia | Roserade | Level 40 |
+| Aipom | Ambipom | Level 32 |
+| Misdreavus | Mismagius | Level 38 |
+| Murkrow | Honchkrow | Level 38 |
+| Sneasel | Weavile | Level 40 |
+| Lickitung | Lickilicky | Level 33 |
+| Tangela | Tangrowth | Level 38 |
+| Togetic | Togekiss | Level 40 |
+| Gligar | Gliscor | Level 40 |
+| Piloswine | Mamoswine | Level 40 |
+| Kirlia | Gallade | Level 30 (male only) |
+| Snorunt | Froslass | Level 42 (female only) |
