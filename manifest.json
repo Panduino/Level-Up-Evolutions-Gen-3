@@ -1,0 +1,17 @@
+{
+  "id": "level_up_trade_evolutions",
+  "name": "Level Up Trade Evolutions",
+  "version": "0.1.0",
+  "api": 2,
+  "entry": "main.lua",
+  "profile": "overhaul",
+  "category": "GAMEPLAY",
+  "games": ["firered", "leafgreen"],
+  "permissions": ["engine_internals"],
+  "priority": 100,
+  "dependencies": ["national_dex_gen3"],
+  "optional_dependencies": [],
+  "conflicts": [],
+  "description": "Replaces trade-based evolutions through Generation 4 with level-up evolutions, including held-item trades registered by National Dex Gen 3.",
+  "github": "Panduino/Level-Up-Evolutions-Gen-3"
+}
