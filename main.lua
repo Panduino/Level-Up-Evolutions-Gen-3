@@ -127,9 +127,49 @@ return function(mod)
     end
   end
 
+  local EXTRA_LEVEL_EVOLUTIONS = {
+    { source = 315, target = 407, level = 40 }, -- Roselia -> Roserade
+    { source = 190, target = 424, level = 32 }, -- Aipom -> Ambipom
+    { source = 200, target = 429, level = 38 }, -- Misdreavus -> Mismagius
+    { source = 198, target = 430, level = 38 }, -- Murkrow -> Honchkrow
+    { source = 215, target = 461, level = 40 }, -- Sneasel -> Weavile
+    { source = 108, target = 463, level = 33 }, -- Lickitung -> Lickilicky
+    { source = 114, target = 465, level = 38 }, -- Tangela -> Tangrowth
+    { source = 176, target = 468, level = 40 }, -- Togetic -> Togekiss
+    { source = 207, target = 472, level = 40 }, -- Gligar -> Gliscor
+    { source = 221, target = 473, level = 40 }, -- Piloswine -> Mamoswine
+    { source = 281, target = 475, level = 30 }, -- male Kirlia -> Gallade
+    { source = 361, target = 478, level = 42 }, -- female Snorunt -> Froslass
+  }
+
+  local function addExtraLevelEvolutions()
+    local Pokemon = require("src.core.game3.pokemon")
+    Pokemon._evolutions = Pokemon._evolutions or {}
+    for _, spec in ipairs(EXTRA_LEVEL_EVOLUTIONS) do
+      local source = Pokemon.speciesFromNational(spec.source)
+      local target = Pokemon.speciesFromNational(spec.target)
+      if source and target then
+        local rows = Pokemon._evolutions[source] or {}
+        Pokemon._evolutions[source] = rows
+        local found = false
+        for _, row in ipairs(rows) do
+          if tonumber(row.method) == 4 and tonumber(row.target) == target then
+            row.param = spec.level
+            found = true
+            break
+          end
+        end
+        if not found then
+          rows[#rows + 1] = { method = 4, param = spec.level, target = target }
+        end
+      end
+    end
+  end
+
   local function addEeveeEvolutions()
     addLeafeon()
     addEeveeRows()
+    addExtraLevelEvolutions()
   end
 
   mod.events:on("game.ready", function()
@@ -149,6 +189,17 @@ return function(mod)
     local sourceNat = source and Pokemon.national and tonumber(Pokemon.national(source))
     local target = tonumber(evo and evo.speciesId)
     local targetNat = target and Pokemon.national and tonumber(Pokemon.national(target))
+
+    -- Preserve the Gen IV gender split while replacing the unavailable Dawn Stone.
+    if sourceNat == 281 then
+      local female = mon.gender == 1 or mon.gender == "female" or mon.isFemale == true
+      if targetNat == 475 then return not female and (tonumber(mon.level) or 1) >= 30 end
+      if targetNat == 282 and not female and (tonumber(mon.level) or 1) >= 30 then return false end
+    elseif sourceNat == 361 then
+      local female = mon.gender == 1 or mon.gender == "female" or mon.isFemale == true
+      if targetNat == 478 then return female and (tonumber(mon.level) or 1) >= 42 end
+      if targetNat == 362 and female and (tonumber(mon.level) or 1) >= 42 then return false end
+    end
 
     if sourceNat == 133 and (targetNat == 196 or targetNat == 197 or targetNat == 471) then
       local held = numericItem(mon.item or mon.heldItem)
