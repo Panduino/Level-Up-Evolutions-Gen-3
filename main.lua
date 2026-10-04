@@ -32,15 +32,31 @@ return function(mod)
     DUSCLOPS = 43,
   }
 
+  local SPECIES_KEYS = {
+    [64] = "KADABRA",
+    [67] = "MACHOKE",
+    [75] = "GRAVELER",
+    [93] = "HAUNTER",
+    [61] = "POLIWHIRL",
+    [79] = "SLOWPOKE",
+    [95] = "ONIX",
+    [123] = "SCYTHER",
+    [117] = "SEADRA",
+    [137] = "PORYGON",
+    [366] = "CLAMPERL",
+    [112] = "RHYDON",
+    [125] = "ELECTABUZZ",
+    [126] = "MAGMAR",
+    [233] = "PORYGON2",
+    [356] = "DUSCLOPS",
+  }
+
   local function keyFor(mon)
     local Pokemon = require("src.core.game3.pokemon")
     local species = Pokemon.speciesOf(mon) or tonumber(mon and (mon.species or mon.speciesId))
     if not species then return nil end
-    local key = Pokemon.keyName and Pokemon.keyName(species)
-    if type(key) == "string" then
-      return key:upper():gsub("^SPECIES_", "")
-    end
-    return nil
+    local nat = Pokemon.national and Pokemon.national(species)
+    return SPECIES_KEYS[tonumber(nat)]
   end
 
   local function tradeMethod(evo)
