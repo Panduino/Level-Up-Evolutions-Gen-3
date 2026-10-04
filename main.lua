@@ -128,6 +128,9 @@ return function(mod)
   end
 
   local EXTRA_LEVEL_EVOLUTIONS = {
+    { source = 82, target = 462, level = 45 }, -- Magneton -> Magnezone
+    { source = 193, target = 469, level = 40 }, -- Yanma -> Yanmega
+    { source = 299, target = 476, level = 40 }, -- Nosepass -> Probopass
     { source = 315, target = 407, level = 40 }, -- Roselia -> Roserade
     { source = 190, target = 424, level = 32 }, -- Aipom -> Ambipom
     { source = 200, target = 429, level = 38 }, -- Misdreavus -> Mismagius
