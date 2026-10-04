@@ -79,6 +79,8 @@ return function(mod)
     DUSCLOPS = true,
   }
 
+  local ITEM_LEAF_STONE = 98 -- native FireRed Leaf Stone
+
   local function numericItem(raw)
     if raw == nil then return 0 end
     local n = tonumber(raw)
@@ -96,7 +98,7 @@ return function(mod)
     local ItemsData = require("src.core.game3.items_data")
     local eevee = Pokemon.speciesFromNational(133)
     local leafeon = Pokemon.speciesFromNational(470)
-    local leafStone = ItemsData.toNumericId("leaf-stone")
+    local leafStone = ITEM_LEAF_STONE
     if not eevee or not leafeon or not leafStone then return end
     Pokemon.evolutions(eevee) -- force the host evolution dataset to load first
     local rows = Pokemon._evolutions[eevee] or {}
@@ -254,7 +256,7 @@ return function(mod)
       ItemsData._levelUpEvoLeafStoneInstalled = true
       local originalFieldUseKind = ItemsData.fieldUseKind
       ItemsData.fieldUseKind = function(itemId)
-        if numericItem(itemId) == numericItem("leaf-stone") then return "evo" end
+        if numericItem(itemId) == ITEM_LEAF_STONE then return "evo" end
         return originalFieldUseKind(itemId)
       end
     end
@@ -263,7 +265,7 @@ return function(mod)
     Evolution.itemTarget = function(mon, itemId, session)
       local source = Pokemon.speciesOf(mon) or tonumber(mon and (mon.species or mon.speciesId))
       local sourceNat = source and Pokemon.national and tonumber(Pokemon.national(source))
-      if sourceNat == 133 and numericItem(itemId) == numericItem("leaf-stone") then
+      if sourceNat == 133 and numericItem(itemId) == ITEM_LEAF_STONE then
         local target = Pokemon.speciesFromNational(470)
         if target and Evolution.nationalAllows(target, session) then return target end
       end
@@ -275,7 +277,7 @@ return function(mod)
     Evolution.itemCheck = function(mon, itemId)
       local source = Pokemon.speciesOf(mon) or tonumber(mon and (mon.species or mon.speciesId))
       local sourceNat = source and Pokemon.national and tonumber(Pokemon.national(source))
-      if sourceNat == 133 and numericItem(itemId) == numericItem("leaf-stone") then
+      if sourceNat == 133 and numericItem(itemId) == ITEM_LEAF_STONE then
         return Pokemon.speciesFromNational(470)
       end
       return originalItemCheck(mon, itemId)
