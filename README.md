@@ -1,6 +1,6 @@
 # Level Up Evolutions Gen 3
 
-Make Pokémon that normally depend on trading or unavailable evolution mechanics obtainable in a single-player FireRed or LeafGreen adventure.
+Make Pokémon that normally depend on trading or unavailable evolution mechanics obtainable in a single-player FireRed, LeafGreen, or Emerald adventure.
 
 **Level Up Evolutions Gen 3** gives trade evolutions and several later-generation evolutions practical in-game methods. The goal is simple: if the Pokémon exists in your expanded Pokédex, you should be able to evolve it without trading it to another game.
 
@@ -10,13 +10,7 @@ Make Pokémon that normally depend on trading or unavailable evolution mechanics
 - Supports held-item trade evolutions without requiring a trade
 - Adds practical methods for Generation IV evolutions
 - Includes day/night methods for Espeon and Umbreon
-- Designed for use with National Dex Gen 3
-
-## Screenshots
-
-| Evolution | New Methods | Expanded Pokédex |
-| :---: | :---: | :---: |
-| _Screenshot coming soon_ | _Screenshot coming soon_ | _Screenshot coming soon_ |
+- Generation IV evolutions available when National Dex Gen 3 is installed
 
 ## Evolution Methods
 
@@ -56,9 +50,9 @@ Make Pokémon that normally depend on trading or unavailable evolution mechanics
 | Kirlia | Gallade | Level 30, male only |
 | Snorunt | Froslass | Level 42, female only |
 
-## Requirements
+## Optional Dependency
 
-- [National Dex Gen 3](https://github.com/poooooby/national_dex_gen3)
+- [National Dex Gen 3](https://github.com/poooooby/national_dex_gen3) — required only for Generation IV evolutions.
 
 ## Installation
 
