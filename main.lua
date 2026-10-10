@@ -2,8 +2,9 @@ return function(mod)
   if mod.generation ~= 3 then return end
 
   local ok, natdex = pcall(function() return mod:find("national_dex_gen3") end)
-  if not ok or not natdex then
-    mod.log:warn("National Dex Gen 3 is not installed")
+  local hasNationalDex = ok and natdex ~= nil and natdex ~= false
+  if not hasNationalDex then
+    mod.log:info("National Dex Gen 3 absent; Gen 4 evolutions disabled")
   end
 
   local TRADE_LEVELS = {
@@ -210,7 +211,7 @@ return function(mod)
       local level = tonumber(mon and mon.level) or 1
 
       -- Eevee's three custom level-up branches.
-      if sourceNat == 133 then
+      if hasNationalDex and sourceNat == 133 then
         local held = numericItem(mon.item or mon.heldItem)
         local targetNat
         if held == numericItem("never-melt-ice") then
@@ -230,13 +231,13 @@ return function(mod)
         end
       end
 
-      local spec = sourceNat and directLevels[sourceNat]
+      local spec = hasNationalDex and sourceNat and directLevels[sourceNat]
       if spec and level >= spec.level then
         local allowed = true
-        if sourceNat == 281 then
+        if hasNationalDex and sourceNat == 281 then
           local female = mon.gender == 1 or mon.gender == "female" or mon.isFemale == true
           allowed = not female
-        elseif sourceNat == 361 then
+        elseif hasNationalDex and sourceNat == 361 then
           local female = mon.gender == 1 or mon.gender == "female" or mon.isFemale == true
           allowed = female
         end
@@ -252,7 +253,7 @@ return function(mod)
     -- numeric id is not one of the six ROM evolution stones. Teach the field
     -- item router to classify it as an evolution stone before party selection.
     local ItemsData = require("src.core.game3.items_data")
-    if not ItemsData._levelUpEvoLeafStoneInstalled then
+    if hasNationalDex and not ItemsData._levelUpEvoLeafStoneInstalled then
       ItemsData._levelUpEvoLeafStoneInstalled = true
       local originalFieldUseKind = ItemsData.fieldUseKind
       ItemsData.fieldUseKind = function(itemId)
@@ -265,7 +266,7 @@ return function(mod)
     Evolution.itemTarget = function(mon, itemId, session)
       local source = Pokemon.speciesOf(mon) or tonumber(mon and (mon.species or mon.speciesId))
       local sourceNat = source and Pokemon.national and tonumber(Pokemon.national(source))
-      if sourceNat == 133 and numericItem(itemId) == ITEM_LEAF_STONE then
+      if hasNationalDex and sourceNat == 133 and numericItem(itemId) == ITEM_LEAF_STONE then
         local target = Pokemon.speciesFromNational(470)
         if target and Evolution.nationalAllows(target, session) then return target end
       end
@@ -286,10 +287,10 @@ return function(mod)
 
   mod.events:on("game.ready", function()
     installDirectEvolutionOverrides()
-    addEeveeEvolutions()
+    if hasNationalDex then addEeveeEvolutions() end
     local Pokemon = require("src.core.game3.pokemon")
     if Pokemon.onReload then
-      Pokemon.onReload(addEeveeEvolutions, "level_up_trade_evolutions")
+      if hasNationalDex then Pokemon.onReload(addEeveeEvolutions, "level_up_trade_evolutions") end
     end
   end)
 
@@ -314,7 +315,7 @@ return function(mod)
       if targetNat == 362 and female and (tonumber(mon.level) or 1) >= 42 then return false end
     end
 
-    if sourceNat == 133 and (targetNat == 196 or targetNat == 197 or targetNat == 471) then
+    if hasNationalDex and sourceNat == 133 and (targetNat == 196 or targetNat == 197 or targetNat == 471) then
       local held = numericItem(mon.item or mon.heldItem)
       if targetNat == 471 then return held == numericItem("never-melt-ice") end
       if held ~= numericItem("soothe-bell") then return false end
